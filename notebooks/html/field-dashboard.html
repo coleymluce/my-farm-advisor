@@ -545,7 +545,9 @@
 
         /* Map Panel */
         .map-panel {
-            flex: 1;
+            flex: none;
+            height: 520px;
+            max-height: 520px;
             background: var(--bg-card);
             border-radius: var(--radius-lg);
             padding: var(--space-xl);
@@ -553,6 +555,7 @@
             border: 1px solid var(--border-light);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .map-header {
@@ -645,9 +648,12 @@
         }
 
         #map {
-            flex: 1;
+            width: 100%;
+            height: 480px;
+            min-height: 480px;
+            max-height: 480px;
+            display: block;
             border-radius: var(--radius-md);
-            min-height: 380px;
             border: 1px solid var(--border-light);
         }
 
@@ -15190,14 +15196,17 @@
                     });
                     layer.bringToFront();
                     
-                    // Center map on polygon bounds (not centroid)
-                    const bounds = layer.getBounds();
-                    if (bounds && bounds.isValid()) {
-                        map.fitBounds(bounds, { 
-                            padding: [50, 50],
-                            maxZoom: 16
-                        });
-                    }
+                    // Invalidate and fit bounds after delay
+                    setTimeout(function() {
+                        map.invalidateSize(true);
+                        const bounds = layer.getBounds();
+                        if (bounds && bounds.isValid()) {
+                            map.fitBounds(bounds, { 
+                                padding: [40, 40],
+                                maxZoom: 16
+                            });
+                        }
+                    }, 150);
                 } else {
                     layer.setStyle({
                         weight: 1,
@@ -15527,9 +15536,10 @@
             try {
                 // Ensure map is properly centered before capture
                 if (map) {
-                    map.invalidateSize();
+                    map.invalidateSize(true);
+                    
                     // Small delay to ensure map renders correctly
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await new Promise(resolve => setTimeout(resolve, 150));
                     
                     // Center on selected field if one is selected
                     if (currentField && geoJsonLayer) {
@@ -15539,7 +15549,7 @@
                                 const bounds = layer.getBounds();
                                 if (bounds && bounds.isValid()) {
                                     map.fitBounds(bounds, { 
-                                        padding: [50, 50],
+                                        padding: [40, 40],
                                         maxZoom: 16
                                     });
                                 }
@@ -15547,8 +15557,12 @@
                         });
                     }
                     
-                    // Wait for tiles and overlays to render
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // Wait for tiles to fully render
+                    await new Promise(resolve => setTimeout(resolve, 600));
+                    
+                    // Final invalidate before capture
+                    map.invalidateSize(true);
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 
                 // Capture dashboard at 2x resolution
