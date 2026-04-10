@@ -15027,7 +15027,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             initFieldSelect();
             initMap();
-            setTimeout(() => map && map.invalidateSize(true), 100);
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize(true);
+                    const bounds = geoJsonLayer && geoJsonLayer.getBounds();
+                    if (bounds && bounds.isValid()) {
+                        map.fitBounds(bounds, { padding: [30, 30] });
+                    }
+                }
+            }, 250);
             loadWeather(DASHBOARD_DATA.farm_center.lat, DASHBOARD_DATA.farm_center.lon);
             updateChart();
             updateCards(null);
@@ -15126,17 +15134,14 @@
                             ${feature.properties.area_acres ? feature.properties.area_acres.toFixed(1) + ' ac' : ''}
                         </div>
                     </div>`;
-                    const bounds = layer.getBounds();
-                    const topCenter = L.latLng(bounds.getNorth(), (bounds.getWest() + bounds.getEast()) / 2);
+                    
                     layer.bindPopup(popupContent, {
                         autoPan: true,
                         autoPanPadding: [40, 40],
-                        autoPanPaddingTopLeft: [40, 80],
-                        autoPanPaddingBottomRight: [40, 40],
                         maxWidth: 220,
                         minWidth: 160,
-                        offset: [0, -15]
-                    }).setLatLng(topCenter);
+                        offset: [0, -20]
+                    });
 
                     layer.on('click', function() {
                         selectFieldByName(fieldName);
