@@ -657,6 +657,18 @@
             border: 1px solid var(--border-light);
         }
 
+        .leaflet-popup-content-wrapper {
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            padding: 8px 12px;
+        }
+        .leaflet-popup-content {
+            margin: 0;
+        }
+        .leaflet-popup {
+            margin-bottom: 12px;
+        }
+
         /* ========================================
            LOADING STATE
            ======================================== */
@@ -15102,41 +15114,27 @@
                     const fieldName = getFieldNameFromFeature(feature);
                     const fieldData = DASHBOARD_DATA.fields.find(f => f.name === fieldName);
                     
-                    let popupContent = `<div style="min-width: 200px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                        <strong style="font-size: 14px;">${fieldName}</strong><br>
-                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #eee;">
-                        <b style="color: #1a5c2e;">Soil Details:</b><br>
-                        <span style="color: #666;">Type:</span> ${feature.properties.muname || 'N/A'}<br>
-                        <span style="color: #666;">Drainage:</span> ${feature.properties.drainagecl || 'N/A'}<br>
-                        <span style="color: #666;">Component:</span> ${feature.properties.compname || 'N/A'} (${feature.properties.comppct_r || 'N/A'}%)<br>
-                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #eee;">
-                        <b style="color: #1a5c2e;">Lab Results:</b><br>
-                        <span style="color: #666;">pH:</span> ${feature.properties.ph1to1h2o_r || 'N/A'}<br>
-                        <span style="color: #666;">OM:</span> ${feature.properties.om_r || 'N/A'}%<br>
-                        <span style="color: #666;">CEC:</span> ${feature.properties.cec7_r || 'N/A'}<br>
-                        <span style="color: #666;">AWC:</span> ${feature.properties.awc_r || 'N/A'}<br>
-                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #eee;">
-                        <b style="color: #1a5c2e;">Texture:</b><br>
-                        <span style="color: #666;">Sand:</span> ${feature.properties.sandtotal_r || 'N/A'}%<br>
-                        <span style="color: #666;">Silt:</span> ${feature.properties.silttotal_r || 'N/A'}%<br>
-                        <span style="color: #666;">Clay:</span> ${feature.properties.claytotal_r || 'N/A'}%<br>
-                        <hr style="margin: 8px 0; border: none; border-top: 1px solid #eee;">
-                        <b style="color: #1a5c2e;">Other:</b><br>
-                        <span style="color: #666;">Area:</span> ${feature.properties.area_acres ? feature.properties.area_acres.toFixed(1) + ' ac' : 'N/A'}<br>
-                        <span style="color: #666;">NDVI:</span> ${fieldData && fieldData.ndvi !== null ? fieldData.ndvi.toFixed(2) : 'N/A'}<br>
+                    let popupContent = `<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 12px; line-height: 1.4;">
+                        <div style="font-weight: 600; color: #1a5c2e; font-size: 13px; margin-bottom: 6px;">${fieldName}</div>
+                        <div style="color: #666;">${feature.properties.muname || 'N/A'}</div>
+                        <div style="margin-top: 6px; color: #555;">
+                            pH: ${feature.properties.ph1to1h2o_r || 'N/A'} · OM: ${feature.properties.om_r || 'N/A'}% · NDVI: ${fieldData && fieldData.ndvi !== null ? fieldData.ndvi.toFixed(2) : 'N/A'}
+                        </div>
+                        <div style="margin-top: 4px; color: #888; font-size: 11px;">
+                            ${feature.properties.area_acres ? feature.properties.area_acres.toFixed(1) + ' ac' : ''}
+                        </div>
                     </div>`;
+                    const bounds = layer.getBounds();
+                    const topCenter = L.latLng(bounds.getNorth(), (bounds.getWest() + bounds.getEast()) / 2);
                     layer.bindPopup(popupContent, {
                         autoPan: true,
-                        autoPanPadding: [50, 50],
-                        autoPanPaddingTopLeft: [50, 100],
-                        offset: [0, -10]
-                    });
-                    
-                    layer.bindTooltip(`<strong>${fieldName}</strong><br><span style="color: #666;">${feature.properties.muname || ''}</span><br><span style="color: #2d8659;">NDVI: ${fieldData && fieldData.ndvi !== null ? fieldData.ndvi.toFixed(2) : 'N/A'}</span>`, {
-                        sticky: true,
-                        direction: 'top',
-                        offset: [0, -10]
-                    });
+                        autoPanPadding: [40, 40],
+                        autoPanPaddingTopLeft: [40, 80],
+                        autoPanPaddingBottomRight: [40, 40],
+                        maxWidth: 220,
+                        minWidth: 160,
+                        offset: [0, -15]
+                    }).setLatLng(topCenter);
 
                     layer.on('click', function() {
                         selectFieldByName(fieldName);
