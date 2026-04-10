@@ -655,6 +655,7 @@
             display: block;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-light);
+            overflow: hidden;
         }
 
         .leaflet-popup-content-wrapper {
@@ -15026,6 +15027,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initFieldSelect();
             initMap();
+            setTimeout(() => map && map.invalidateSize(true), 100);
             loadWeather(DASHBOARD_DATA.farm_center.lat, DASHBOARD_DATA.farm_center.lon);
             updateChart();
             updateCards(null);
