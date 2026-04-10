@@ -555,7 +555,7 @@
             border: 1px solid var(--border-light);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .map-header {
@@ -15125,11 +15125,17 @@
                         <span style="color: #666;">Area:</span> ${feature.properties.area_acres ? feature.properties.area_acres.toFixed(1) + ' ac' : 'N/A'}<br>
                         <span style="color: #666;">NDVI:</span> ${fieldData && fieldData.ndvi !== null ? fieldData.ndvi.toFixed(2) : 'N/A'}<br>
                     </div>`;
-                    layer.bindPopup(popupContent);
+                    layer.bindPopup(popupContent, {
+                        autoPan: true,
+                        autoPanPadding: [50, 50],
+                        autoPanPaddingTopLeft: [50, 100],
+                        offset: [0, -10]
+                    });
                     
                     layer.bindTooltip(`<strong>${fieldName}</strong><br><span style="color: #666;">${feature.properties.muname || ''}</span><br><span style="color: #2d8659;">NDVI: ${fieldData && fieldData.ndvi !== null ? fieldData.ndvi.toFixed(2) : 'N/A'}</span>`, {
                         sticky: true,
-                        direction: 'top'
+                        direction: 'top',
+                        offset: [0, -10]
                     });
 
                     layer.on('click', function() {
